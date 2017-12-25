@@ -5,12 +5,17 @@ implicit none
 include "mpif.h"
 real(8), dimension(:,:), intent(out) :: a
 integer(4), intent(out) :: x1, y1, x2, y2
-integer(4) :: mpiErr, mpiRank
-call mpi_comm_rank(MPI_COMM_WORLD, mpiRank, mpiErr)
-if(mpiRank == 0) then
-    call master(a, x1, y1, x2, y2)
-else
+integer(4) :: mpiErr, mpiRank, mpisize
+call mpi_comm_size(MPI_COMM_WORLD, mpisize, mpiErr)
+if(mpisize == 1) then
     call helper(a, x1, y1, x2, y2)
+else
+  call mpi_comm_rank(MPI_COMM_WORLD, mpiRank, mpiErr)
+  if(mpiRank == 0) then
+      call master(a, x1, y1, x2, y2)
+  else
+      call helper(a, x1, y1, x2, y2)
+  endif
 endif
 end subroutine
 
